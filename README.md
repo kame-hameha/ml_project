@@ -18,16 +18,21 @@ Tested Version:
 ## 3. Clone repository and change script/s to fit your needs:
 ### 3.1 Install software: 
 Description: Flash image to SD-card, update system, install software, libs and APIs as described in the file
+
 File: software.bash 
 
 ### 3.2 Create a dataset of your choice
+
 File: create-symbols-dataset.py
 
 ### 3.3 Training of recorded dataset (from 3.2)
+
 File: training-symbols-dataset.ipynb (=train dataset)
 
 ### 3.4 (Optional: train multiple datasets, one after each other)
+
 File: training-symbols-dataset-comparison 
 
 ### 3.5 Run inference on new images
+
 File: detect-symbols.py
