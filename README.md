@@ -1,11 +1,16 @@
 # ml_project
 
+This project involves setting up a Raspberry Pi (model 5) with necessary hardware and downloading the Raspbian OS. Users should have basic knowledge of Linux, Terminal, and Python. The project includes cloning a repository, installing software, creating and training datasets with a camera, and running inference on new images. Optionally, multiple datasets can be trained sequentially.
+
+If you need further clarification or assistance, feel free to ask! 😊
+
 ## 0. Hardware requirements
 - Get a Raspberry Pi (model 5)
 - Power plug
 - SD-card (minimum 32 GB)
+- USB-camera 
 - (Optional: case and fan)
-Average price: Raspi5/plug/SD-card/case&fan = 80+5+10+5 € = 100 €)
+Average price: Raspi5/plug/SD-card/case&fan = 80+5+10+5+10 € = ~120 €)
 
 ## 1. Download image and unzip it from: https://www.raspberrypi.com/software/
 Tested Version:
