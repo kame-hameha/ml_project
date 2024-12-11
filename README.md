@@ -31,7 +31,7 @@ File: training-symbols-dataset.ipynb (=train dataset)
 
 ### 3.4 (Optional: train multiple datasets, one after each other)
 
-File: training-symbols-dataset-comparison 
+File: training-symbols-dataset-comparison.ipynb
 
 ### 3.5 Run inference on new images
 
