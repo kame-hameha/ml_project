@@ -12,7 +12,10 @@ If you need further clarification or assistance, feel free to ask! 😊
 - (Optional: case and fan)
 Average price: Raspi5/plug/SD-card/case&fan = 80+5+10+5+10 € = ~120 €)
 
-## 1. Download image and unzip it from: https://www.raspberrypi.com/software/
+## 1. Download image and unzip it from: 
+
+https://www.raspberrypi.com/software/
+
 Tested Version:
 2024-07-04-raspios-bookworm-arm64-full
 
@@ -41,3 +44,7 @@ File: training-symbols-dataset-comparison.ipynb
 ### 3.5 Run inference on new images
 
 File: detect-symbols.py
+
+### 3.6 Download a dataset from dropbox:
+
+https://www.dropbox.com/scl/fi/qyr4uz39u8aghfcbs9x8c/symbols.zip?rlkey=w93kuktegathzdp8lwpyau57q&st=qq2v7iuw&dl=0
