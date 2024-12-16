@@ -25,9 +25,14 @@ Tested Version:
 
 ## 3. Clone repository and change script/s to fit your needs:
 ### 3.1 Install software: 
-Description: Flash image to SD-card, update system, install software, libs and APIs as described in the file
+Description: 
+- Flash image to SD-card,
+- update system,
+- install software, libs and APIs as described in the file
 
 File: software.bash 
+
+(this is not a shell script that installs everything by running it, just copy&paste line-by-line and hit enter to install stuff)
 
 ### 3.2 Create a dataset of your choice
 
