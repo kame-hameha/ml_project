@@ -30,7 +30,6 @@ warnings.filterwarnings("ignore")
 # =============================================================================
 # Declare variables
 # =============================================================================
-
 img_size_x = 32
 img_size_y = 24
 img_dim = img_size_x * img_size_y
@@ -40,29 +39,24 @@ checkpoint_filepath = '/home/pi/Documents/2023 symbols/dataset3/checkpoints'
 # =============================================================================
 # Settings for image recording
 # =============================================================================
-
 cam = cv2.VideoCapture(0)
 cam.set(3,640) # set Width
 cam.set(4,480) # set Height
-
 cv2.namedWindow("camera")
 
 # =============================================================================
 # # Define functions
 # =============================================================================
-
 # Change image size and convert to grayscale images
 def pic_prep (image, x, y):
   image = cv2.resize(image, (y,x)) #größe ändern
   image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #in graustufen ändern
   image = image / 255 #normierung
-
   return image
 
 # =============================================================================
 # Create neural network with 4 layers and (64, 32, 16, 4) neurons per layer.
 # =============================================================================
-
 model = models.Sequential()
 model.add(layers.Dense(64,input_dim=img_dim,activation='relu'))
 model.add(layers.Dense(32,activation='relu'))
@@ -76,7 +70,6 @@ model.compile(loss='mean_squared_error',
 # =============================================================================
 # Load pretrained dataset weights to e.g. test on new (unseen) data.
 # =============================================================================
-
 model.load_weights(checkpoint_filepath + ".keras")
 
 
@@ -91,25 +84,25 @@ while True:
     cv2.imshow("test", frame)
 
     k = cv2.waitKey(1)
-    if k%256 == 27:
+    if k == 27:
         # ESC pressed
         print("Escape hit, closing...")
         break
-    elif k%256 == 32:
+    elif k == 32:
         # SPACE pressed
 
-        #Frame einlesen, bearbeiten
+        # read frame
         data_pred = np.zeros((1, img_size_x, img_size_y), dtype=float)
         img_pred = frame
         img_pred = pic_prep(img_pred, img_size_x, img_size_y)
         data_pred[0,:,:] = img_pred
         data_pred = data_pred.reshape(1,img_dim)
 
-        #predicten
+        # prediction
         result = model.predict(data_pred)
         result = np.round(result, decimals=2)
 
-        #Klasse ausgabe
+        # output of class that has hightest probability
         max_res = 0
         res_index = 4
         for i in range(0, 4, 1):
@@ -120,15 +113,15 @@ while True:
         result = np.round(result * 100, decimals=2)
 
         if res_index == 0:
-            print('das ist zu ' + str(result[0,0]) + '% ein Kreuz!')
+            print('Probability of ' + str(result[0,0]) + '%f or a cross!')
         elif res_index == 1:
-            print('das ist zu ' + str(result[0,1]) + '% ein Kreis!')
+            print('Probability of ' + str(result[0,1]) + '%f or a circle!')
         elif res_index == 2:
-            print('das ist zu ' + str(result[0,2]) + '% ein Dreieck!')
+            print('Probability of ' + str(result[0,2]) + '%f or a triangle!')
         elif res_index == 3:
-            print('das ist zu ' + str(result[0,3]) + '% ein Viereck!')
+            print('Probability of ' + str(result[0,3]) + '%f or a square!')
         elif res_index == 4:
-            print('du hast einen Fehler in deinem Programm!')
+            print('Error!')
 
         print (result[0, :])
 

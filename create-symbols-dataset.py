@@ -42,7 +42,7 @@ warnings.filterwarnings("ignore")
 # =============================================================================
 # Create folders in dataset path for data, gt (ground truth) and 
 # chpt (checkpoint) folder
-dataset_path = "/home/pi/images/dataset"
+dataset_path = "/home/pi/images/metzger"
 
 # =============================================================================
 # Camera setup
@@ -73,11 +73,11 @@ try:
         # Press some keys to record images, and then press another key, 
         # i. e. 0 to write the first index into the text file.
         k = cv2.waitKey(1)
-        if k%256 == 27:
+        if k == 27:
             # ESC pressed
             print("Escape hit, closing...")
             break
-        if k%256 == 8:
+        if k == 8:
             # BACKSPACE pressed
             # Search folder for already recorded images&ground truth data
             list_data = glob.glob(dataset_path +"/data/*")
@@ -92,7 +92,7 @@ try:
                 print("Images and annotated data are not equal!")
                 
             print("Continue with :" + str(img_counter))
-        elif k%256 == 32:
+        elif k == 32:
             # SPACE pressed
             img_name = dataset_path + "/data/{}.png".format(img_counter)
             gt_name = dataset_path + "/gt/{}.txt".format(img_counter)
@@ -130,7 +130,7 @@ try:
             img_counter += 1
 
 except KeyboardInterrupt:
-    print("Programmabbruch!")
+    print("Program aborted!")
 finally:
     # =========================================================================
     # Clean exit

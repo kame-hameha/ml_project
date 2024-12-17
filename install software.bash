@@ -18,8 +18,7 @@ sudo apt install apt-transport-https
 sudo apt update
 sudo apt install code
 
-1. Install Jupyter extension in VS Code 
->>> Click on Extenstions (CTRL+SHIFT+X) >>> Enter Jupyter >>> Install Jupyter
+1. Install Jupyter extension in VS Code >>> Click on Extenstions (CTRL+SHIFT+X) >>> Enter Jupyter >>> Install Jupyter
 
 2. Create a project folder (e.g. in home directory /home/pi) & navigate into it
 mkdir ki-project
@@ -33,7 +32,7 @@ source my_virtual_env/bin/activate
 5. Install ipykernel
 pip install ipykernel
 6. Create new kernel
-python3 -m ipykernel install --user --name=myproject_kernel
+python3 -m ipykernel install --user --name=my_project_kernel
 
 7. Install packages within your Jupyter notebook
 pip install opencv-python
@@ -46,7 +45,7 @@ pip install jupyter
 8. Start & open Jupyter notebook
 jupyter notebook
 8.1 Create: New Jupyter Notebook (cmd+shift+p)
-8.2. Select correct kernel for project >>> myproject_kernel (my_virtual_env/bin/python3)
+8.2. Select correct kernel for project >>> my_project_kernel (my_virtual_env/bin/python3)
 ###################################################################################
 # Typtical errors
 # 
