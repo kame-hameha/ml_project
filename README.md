@@ -17,7 +17,7 @@ Average price: Raspi5/plug/SD-card/case&fan = 80+5+10+5+10 € = ~120 €)
 https://www.raspberrypi.com/software/
 
 Tested Version:
-2024-07-04-raspios-bookworm-arm64-full
+2024-11-13-raspios-bookworm-arm64-full.img
 
 ## 2. (Optional) 
 - Basic knowledge in Linux, Terminal (Konsole), und Python.
