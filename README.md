@@ -50,6 +50,7 @@ File: training-symbols-dataset-comparison.ipynb
 
 File: detect-symbols.py
 
-### 3.6 Download a dataset from dropbox:
+### 3.6 Datasets 
 
-https://www.dropbox.com/scl/fi/qyr4uz39u8aghfcbs9x8c/symbols.zip?rlkey=w93kuktegathzdp8lwpyau57q&st=qq2v7iuw&dl=0
+- (mnist and symbols) are included here from now on
+  the symbols dataset will be updated.
