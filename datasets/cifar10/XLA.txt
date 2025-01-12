@@ -1,0 +1,12 @@
+#https://stackoverflow.com/questions/68614547/tensorflow-libdevice-not-found-why-is-it-not-found-in-the-searched-path
+
+1. in venv: 
+python3 -m pip install nvidia-pyindex
+python3 -m pip install nvidia-cuda-nvcc
+
+find / -type d -name "cuda_nvcc" 2>/dev/null
+
+Path:
+/home/metzgeka/tensorflow/lib/python3.12/site-packages/nvidia/cuda_nvcc
+
+export XLA_FLAGS=--xla_gpu_cuda_data_dir=/home/metzgeka/tensorflow/lib/python3.12/site-packages/nvidia/cuda_nvcc
