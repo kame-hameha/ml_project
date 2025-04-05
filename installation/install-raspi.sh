@@ -33,4 +33,6 @@ echo "=== Installation abgeschlossen ==="
 echo "Neustart"
 sudo reboot now
 
+# (Optional stuff)
 # Starte Visual Studio Code via: "code --js-flags="--nodecommit_pooled_pages"" 
+# wget -qO- https://raw.githubusercontent.com/Botspot/pi-apps/master/install | bash
