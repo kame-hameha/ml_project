@@ -29,5 +29,8 @@ python3 -m ipykernel install --user --name=ml_project_kernel
 pip install opencv-python tensorflow matplotlib pandas scipy jupyter
 
 echo "=== Installation abgeschlossen ==="
-echo "Starte Jupyter Notebook mit: jupyter notebook oder in Visual Studio Code"
-source .venv/bin/activate
+
+echo "Neustart"
+sudo reboot now
+
+# Starte Visual Studio Code via: "code --js-flags="--nodecommit_pooled_pages"" 
