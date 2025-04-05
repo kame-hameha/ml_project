@@ -39,6 +39,7 @@ import glob
 # Imports and other stuff you could remove
 # =============================================================================
 import warnings
+import os
 warnings.filterwarnings("ignore")
 
 # =============================================================================
@@ -46,7 +47,13 @@ warnings.filterwarnings("ignore")
 # =============================================================================
 # Create folders in dataset path for data, gt (ground truth) and 
 # chpt (checkpoint) folder
-dataset_path = "/home/pi/images/metzger"
+dataset_path = "/home/pi/ml_project/datasets/symbols/dataset7"
+
+# Check if dataset path exists, if not create it
+if not os.path.exists(dataset_path):
+    os.makedirs(dataset_path)
+    os.makedirs(os.path.join(dataset_path, "data"))
+    os.makedirs(os.path.join(dataset_path, "gt"))
 
 # =============================================================================
 # Camera setup
