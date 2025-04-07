@@ -1,0 +1,5 @@
+dataset3 = 440 images 				--> 0-439
+dataset4 = 20 images				--> 440 - 459
+(dataset5 = 82 images) not used
+(dataset6 = 15 images) not used
+dataset 7 = 40 images * X = 240 images		--> 460 - 
