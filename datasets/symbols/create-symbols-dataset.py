@@ -8,7 +8,7 @@
 # Version:        1.0
 # =============================================================================
 """The Module has been build for creating a dataset with images + ground truth
-   on a Raspberry Pi 4 with a standard USB camera. An image with a resolution 
+   on a Raspberry Pi 4 with a standard USB camera. An image with a resolution m
    of 640px x 480px is recorded and you can control image recording plus ground 
    truth creation via pressing the following keys on the keyboard:
    - ESC:       Quit
@@ -17,6 +17,7 @@
    - BACKSPACE  Search folders and start image/gt file counters with highest 
                 count (i. e. already taken 100 images --> images names 0 - 99, 
                 next image with <100.png> and gt with 100.txt).
+   - END:      Enter number where to start counting from (i. e. 10, 20, ...).
    - 0          Use label 0 for grount truth and write it to .txt file.
    - ...        "
    - 3          "
@@ -88,6 +89,12 @@ try:
             # ESC pressed
             print("Escape hit, closing...")
             break
+        if k == 35:
+            # END pressed
+            print("Enter number where to start counting from:")
+            e = cv2.waitKey(-1)
+            img_counter = e
+            print("Continue with :" + str(img_counter))
         if k == 8:
             # BACKSPACE pressed
             # Search folder for already recorded images&ground truth data
