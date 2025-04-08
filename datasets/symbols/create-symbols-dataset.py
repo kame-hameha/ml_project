@@ -4,8 +4,8 @@
 # Created By:     Kai Metzger
 # Created School: Franz-Oberthuer-Schule Wuerzburg
 # Created Email:  metzgerkai@franz-oberthuer-schule.de
-# Created Date:   Fri February 23 07:31:00 UTC 2024
-# Version:        1.0
+# Created Date:   Fri February 23 07:31:00 UTC 2025
+# Version:        1.0.1
 # =============================================================================
 """The Module has been build for creating a dataset with images + ground truth
    on a Raspberry Pi 4 with a standard USB camera. An image with a resolution m
@@ -17,7 +17,7 @@
    - BACKSPACE  Search folders and start image/gt file counters with highest 
                 count (i. e. already taken 100 images --> images names 0 - 99, 
                 next image with <100.png> and gt with 100.txt).
-   - END:      Enter number where to start counting from (i. e. 10, 20, ...).
+   - ENTER:     todo: Enter number where to start counting from (i. e. 10, 20, ...).
    - 0          Use label 0 for grount truth and write it to .txt file.
    - ...        "
    - 3          "
@@ -122,10 +122,10 @@ try:
             
             class_label = None
             print("Enter class label for current image, press ...\n \
-                  0 = cross \n \
-                  1 = circle \n \
-                  2 = square \n \
-                  3 = triangle")
+                  0 = cross = Kreuz \n \
+                  1 = circle = Kreis \n \
+                  2 = triangle = Dreieck \n \
+                  3 = square = Viereck")
             # Enter class label (0:circle or 1:rectangle or ...)
             # on keyboard, caution: Num-Pad does not work here!
             c = cv2.waitKey(-1)
