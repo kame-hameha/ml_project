@@ -4,15 +4,15 @@
 # Created By:     Kai Metzger
 # Created School: Franz-Oberthuer-Schule Wuerzburg
 # Created Email:  metzgerkai@franz-oberthuer-schule.de
-# Created Date:   Fri December 06 18:40:00 UTC 2024
-# Version:        1.0
+# Created Date:   Mon April 07 23:00:00 UTC 2025
+# Version:        1.0.1
 # =============================================================================
 """This script loads the pretrained weights into a (64,32,16,4)-layer neuronal
    network that can distinguish the 4 symbols (circle, cross, square, 
    triangle). 
-   The model was trained on 440 images that where recorded with 640x480 pixels 
-   and downsized to 32 x 28 pixels to train the model on a Raspberry Pi 5 with
-   8 GB RAM.
+   The model was trained on some images that where recorded with 640x480 pixels 
+   and downsized to 32 x 32 pixels to train the model on a Raspberry Pi 5 with
+   4-8 GB RAM.
    """
 
 # =============================================================================
@@ -31,10 +31,10 @@ warnings.filterwarnings("ignore")
 # Declare variables
 # =============================================================================
 img_size_x = 32
-img_size_y = 24
+img_size_y = 32
 img_dim = img_size_x * img_size_y
 
-checkpoint_filepath = '/home/pi/Documents/2023 symbols/dataset3/checkpoints'
+checkpoint_filepath = '/home/pi/ml_project/datasets/symbols/dataset1/checkpoints'
 
 # =============================================================================
 # Settings for image recording
