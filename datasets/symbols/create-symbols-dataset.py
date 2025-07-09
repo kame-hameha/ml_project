@@ -48,7 +48,8 @@ warnings.filterwarnings("ignore")
 # =============================================================================
 # Create folders in dataset path for data, gt (ground truth) and 
 # chpt (checkpoint) folder
-dataset_path = "/home/pi/ml_project/datasets/symbols/dataset7"
+dataset_path = "/home/pi/ml_project/datasets/symbols/dataset9"
+hd_camera = True
 
 # Check if dataset path exists, if not create it
 if not os.path.exists(dataset_path):
@@ -60,9 +61,25 @@ if not os.path.exists(dataset_path):
 # Camera setup
 # =============================================================================
 # Settings for image recording
-cam = cv2.VideoCapture(0)
-cam.set(3,640) # set Width
-cam.set(4,480) # set Height       
+cam = cv2.VideoCapture(0) 
+# command to get USB cam formats:
+# v4l2-ctl -d /dev/video0 --list-formats-ext
+
+if hd_camera:
+    print("Using hd camera!")
+    cam.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+    # Set properties. Each returns === True on success (i.e. correct resolution)
+    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+else:
+    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+# Check image size:
+#width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)
+#height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT)
+#print(f"Frame Width: {width}, Frame Height: {height}")
+
 cv2.namedWindow("camera")
 
 # =============================================================================
@@ -80,6 +97,7 @@ try:
         if not ret:
             print("failed to grab frame")
             break
+
         cv2.imshow("camera", frame)
 
         # Press some keys to record images, and then press another key, 
