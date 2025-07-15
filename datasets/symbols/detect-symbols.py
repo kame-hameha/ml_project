@@ -23,6 +23,7 @@ import cv2
 import os
 import numpy as np
 from tensorflow.keras import layers, models, utils
+import keras
 import glob
 import warnings
 warnings.filterwarnings("ignore")
@@ -34,7 +35,12 @@ img_size_x = 32
 img_size_y = 32
 img_dim = img_size_x * img_size_y
 
-checkpoint_filepath = '/home/pi/ml_project/datasets/symbols/dataset1/checkpoints'
+# Change the following paths to your dataset path
+home_dir = os.path.expanduser("~")
+dataset_for_training = "dataset1"
+img_dir = home_dir + "/ml_project/datasets/symbols/" + dataset_for_training + "/data"
+gt_dir = home_dir + "/ml_project/datasets/symbols/" + dataset_for_training + "/gt"
+checkpoint_filepath = home_dir + "/ml_project/datasets/symbols/" + dataset_for_training + "/chpt/"
 
 # =============================================================================
 # Settings for image recording
@@ -58,19 +64,19 @@ def pic_prep (image, x, y):
 # Create neural network with 4 layers and (64, 32, 16, 4) neurons per layer.
 # =============================================================================
 model = models.Sequential()
-model.add(layers.Dense(64,input_dim=img_dim,activation='relu'))
-model.add(layers.Dense(32,activation='relu'))
-model.add(layers.Dense(16,activation='relu'))
+model.add(layers.Dense(32,input_dim=img_dim,activation='relu'))
 model.add(layers.Dense(4,activation='sigmoid'))
+opt = keras.optimizers.Adam(learning_rate=0.001)
 model.compile(loss='mean_squared_error', 
-              optimizer='adam', 
+              optimizer=opt, 
               metrics=['accuracy'])
 
 
 # =============================================================================
 # Load pretrained dataset weights to e.g. test on new (unseen) data.
 # =============================================================================
-model.load_weights(checkpoint_filepath + ".keras")
+print(checkpoint_filepath + "chpt.keras")
+model.load_weights(checkpoint_filepath + "chpt.keras")
 
 
 # =============================================================================
