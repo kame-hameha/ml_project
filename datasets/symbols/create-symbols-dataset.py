@@ -49,7 +49,7 @@ warnings.filterwarnings("ignore")
 # Create folders in dataset path for data, gt (ground truth) and 
 # chpt (checkpoint) folder
 dataset_path = "/home/pi/ml_project/datasets/symbols/dataset9"
-hd_camera = True
+hd_camera = False
 
 # Check if dataset path exists, if not create it
 if not os.path.exists(dataset_path):
