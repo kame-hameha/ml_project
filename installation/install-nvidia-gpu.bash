@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # Shebang -> Interpreter mit Bash ausführen
+# Downloas files manually:
+# cuda-repo-ubuntu2404-13-0-local_13.0.2-580.95.05-1_amd64.deb
+# cudnn-local-repo-ubuntu2404-9.14.0_1.0-1_amd64.deb
 
 # Bei Fehler abbrechen etc.
 set -euo pipefail
