@@ -1,2 +1,4 @@
 .venv/
 *.keras
+*.json
+*.h5
