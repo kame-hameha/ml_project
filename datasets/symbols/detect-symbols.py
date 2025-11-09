@@ -64,7 +64,9 @@ def pic_prep (image, x, y):
 # Create neural network with 4 layers and (64, 32, 16, 4) neurons per layer.
 # =============================================================================
 model = models.Sequential()
-model.add(layers.Dense(32,input_dim=img_dim,activation='relu'))
+model.add(layers.Dense(128,input_dim=img_dim,activation='relu'))
+model.add(layers.Dense(64,input_dim=img_dim,activation='relu'))
+model.add(layers.Dense(8,input_dim=img_dim,activation='relu'))
 model.add(layers.Dense(4,activation='sigmoid'))
 opt = keras.optimizers.Adam(learning_rate=0.001)
 model.compile(loss='mean_squared_error', 
