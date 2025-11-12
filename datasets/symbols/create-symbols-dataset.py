@@ -18,7 +18,7 @@
    - BACKSPACE  Search folders and start image/gt file counters with highest 
                 count (i. e. already taken 100 images --> images names 0 - 99, 
                 next image with <100.png> and gt with 100.txt).
-   - ENTER:     todo: Enter number where to start counting from (i. e. 10, 20, ...).
+   - TAB:       Enter number where to start counting from (i. e. 10, 360, ...).
    - 0          Use label 0 for grount truth and write it to .txt file.
    - ...        "
    - 3          "
@@ -50,7 +50,7 @@ warnings.filterwarnings("ignore")
 # Create folders in dataset path for data, gt (ground truth) and 
 # chpt (checkpoint) folder
 dataset_path = "/home/pi/ml_project/datasets/symbols/dataset9"
-hd_camera = False
+hd_camera = True
 
 # Check if dataset path exists, if not create it
 if not os.path.exists(dataset_path):
@@ -84,6 +84,59 @@ else:
 cv2.namedWindow("camera")
 
 # =============================================================================
+# Functions
+# =============================================================================
+def read_number_with_cv2(window_name='Type number', prompt='Type number (Enter to finish, ESC to cancel): '):
+    number_str = ''
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    base_img = np.zeros((120,600,3), dtype=np.uint8)
+
+    while True:
+        img = base_img.copy()
+        text = prompt + number_str
+        cv2.putText(img, text, (10,60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (200,220,255), 2)
+        cv2.imshow(window_name, img)
+
+        key = cv2.waitKey(0)
+        if key == -1:
+            continue
+
+        # Useful for debugging unknown codes - uncomment when needed:
+        # print("raw key:", key, " hex:", hex(key))
+
+        low = key & 0xFF  # low 8 bits - usually ascii for normal keys
+
+        # Accept digits from ASCII low byte
+        if ord('0') <= low <= ord('9'):
+            number_str += chr(low)
+            continue
+
+        # Enter (CR/LF) handling: some platforms return 13, 10 or 13+256 etc.
+        if low in (10, 13):
+            break
+
+        # ESC to cancel
+        if low == 27:
+            number_str = ''
+            break
+
+        # If the keypad produces non-ASCII codes on your platform (e.g., you saw 1360),
+        # map them manually to digits using values you observed with the debug snippet:
+        keypad_map = {
+            # example entries (replace with numbers you saw while debugging)
+            # 1360: '0', 1361: '1', ... 
+        }
+        if key in keypad_map:
+            number_str += keypad_map[key]
+            continue
+
+        # ignore other keys
+        # optionally show a brief flash or sound for invalid key
+
+    cv2.destroyWindow(window_name)
+    return int(number_str) if number_str else None
+
+# =============================================================================
 # Variables
 # =============================================================================
 img_counter = 0
@@ -108,11 +161,9 @@ try:
             # ESC pressed
             print("Escape hit, closing...")
             break
-        if k == 35:
-            # END pressed
-            print("Enter number where to start counting from:")
-            e = cv2.waitKey(-1)
-            img_counter = e
+        if k == 9:
+            # Check if TAB is pressed on keyboard
+            img_counter = read_number_with_cv2()
             print("Continue with :" + str(img_counter))
         if k == 8:
             # BACKSPACE pressed
