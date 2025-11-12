@@ -5,7 +5,8 @@
 # Created School: Franz-Oberthuer-Schule Wuerzburg
 # Created Email:  metzgerkai@franz-oberthuer-schule.de
 # Created Date:   Fri February 23 07:31:00 UTC 2025
-# Version:        1.0.1
+# Changed Date:   Wed November 12 09:41 UTC 2025
+# Version:        1.0.2
 # =============================================================================
 """The Module has been build for creating a dataset with images + ground truth
    on a Raspberry Pi 4 with a standard USB camera. An image with a resolution m
