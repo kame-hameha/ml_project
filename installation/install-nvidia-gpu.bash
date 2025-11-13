@@ -4,6 +4,13 @@
 # Downloas files manually:
 # cuda-repo-ubuntu2404-13-0-local_13.0.2-580.95.05-1_amd64.deb
 # cudnn-local-repo-ubuntu2404-9.14.0_1.0-1_amd64.deb
+# https://developer.nvidia.com/cuda-toolkit-archive
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
+sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget https://developer.download.nvidia.com/compute/cuda/13.0.2/local_installers/cuda-repo-ubuntu2404-13-0-local_13.0.2-580.95.05-1_amd64.deb
+# https://developer.nvidia.com/cudnn-archive
+wget https://developer.download.nvidia.com/compute/cudnn/9.14.0/local_installers/cudnn-local-repo-ubuntu2404-9.14.0_1.0-1_amd64.deb
+sudo dpkg -i cudnn-local-repo-ubuntu2404-9.14.0_1.0-1_amd64.deb
 
 # Bei Fehler abbrechen etc.
 set -euo pipefail
