@@ -26,7 +26,7 @@ pip install ipykernel
 python3 -m ipykernel install --user --name=ml_project_kernel
 
 # 5. Weitere Pakete installieren (auch innerhalb Jupyter nutzbar)
-pip install opencv-python tensorflow matplotlib pandas scipy jupyter
+pip install opencv-python tensorflow matplotlib pandas scipy jupyter tensorflow-hub scikit-learn seaborn
 
 echo "=== Installation abgeschlossen ==="
 
