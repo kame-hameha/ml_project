@@ -49,7 +49,7 @@ warnings.filterwarnings("ignore")
 # =============================================================================
 # Create folders in dataset path for data, gt (ground truth) and 
 # chpt (checkpoint) folder
-dataset_path = "/home/pi/ml_project/datasets/symbols/dataset9"
+dataset_path = "/home/pi/ml_project/datasets/symbols/dataset11"
 hd_camera = True
 
 # Check if dataset path exists, if not create it
@@ -196,8 +196,9 @@ try:
                   1 = circle = Kreis \n \
                   2 = triangle = Dreieck \n \
                   3 = square = Viereck")
-            # Enter class label (0:circle or 1:rectangle or ...)
-            # on keyboard, caution: Num-Pad does not work here!
+            # Enter class label (0:cross or 1:circle or triangle or 3:square) 
+            # for ground truth via pressing the number keys on keyboard, 
+            # caution: Num-Pad does not work here!
             c = cv2.waitKey(-1)
             if c == 48: # ASCII 48 = key 0 on keyboard
                 class_label = 0
