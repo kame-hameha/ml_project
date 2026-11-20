@@ -2,3 +2,4 @@
 *.keras
 *.json
 *.h5
+*-split70-15-15/
