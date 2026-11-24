@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ein Bild ist eine Zahlenmatrix</title>
+<style>:root{--blau:#1f5f99;--blau-hell:#e8f0f8;--orange:#d9731a;--gruen:#2e8b57;--rot:#c0392b;--grau:#5f6b76;--linie:#d5dde5;--hg:#f7f9fb}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif;color:#1d2833;background:#fff;line-height:1.45;font-size:15px}
+header.kopf{background:var(--blau);color:#fff;padding:12px 18px}
+header.kopf .ls{font-size:12px;opacity:.85;letter-spacing:.03em;text-transform:uppercase}
+header.kopf h1{margin:2px 0 0;font-size:21px;font-weight:650}
+main{padding:14px 18px 22px;max-width:1100px;margin:0 auto}
+h2{font-size:17px;margin:18px 0 8px;color:var(--blau)}
+p{margin:6px 0}
+.karte{background:var(--hg);border:1px solid var(--linie);border-radius:10px;padding:12px 14px;margin:10px 0}
+.auftrag{background:#fff7ec;border:1px solid #f1d2ad;border-left:5px solid var(--orange);border-radius:8px;padding:10px 14px;margin:12px 0}
+.auftrag b:first-child{color:var(--orange)}
+.info{background:var(--blau-hell);border-left:5px solid var(--blau);border-radius:8px;padding:10px 14px;margin:10px 0}
+.reihe{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.spalte{flex:1 1 300px;min-width:260px}
+button,select,input{font:inherit}
+button{background:var(--blau);color:#fff;border:0;border-radius:6px;padding:6px 12px;cursor:pointer;margin:2px}
+button:hover{filter:brightness(1.12)}
+button.zweit{background:#fff;color:var(--blau);border:1px solid var(--blau)}
+button.aktiv{background:var(--orange)}
+input[type=range]{width:100%;accent-color:var(--blau)}
+input[type=number]{width:90px;padding:3px 5px;border:1px solid var(--linie);border-radius:5px}
+select{padding:4px 6px;border:1px solid var(--linie);border-radius:5px;background:#fff}
+label{font-size:14px}
+.regler{display:grid;grid-template-columns:110px 1fr 64px;gap:6px;align-items:center;margin:4px 0}
+.regler output{font-variant-numeric:tabular-nums;text-align:right;font-weight:600}
+.mono{font-family:ui-monospace,"DejaVu Sans Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+.formel{font-family:ui-monospace,"DejaVu Sans Mono",Consolas,monospace;background:#fff;border:1px solid var(--linie);border-radius:6px;padding:8px 10px;white-space:normal;overflow-wrap:anywhere}
+.gut{color:var(--gruen);font-weight:600}
+.schlecht{color:var(--rot);font-weight:600}
+.klein{font-size:13px;color:var(--grau)}
+table.daten{border-collapse:collapse;font-size:14px}
+table.daten td,table.daten th{border:1px solid var(--linie);padding:4px 8px;text-align:center}
+table.daten th{background:var(--blau-hell)}
+canvas{touch-action:none;max-width:100%}
+details{margin:8px 0}
+summary{cursor:pointer;color:var(--blau);font-weight:600}
+
+#matrix{border-collapse:collapse;font-size:9.5px}
+#matrix td{width:25px;height:19px;text-align:center;border:1px solid #eef1f4;padding:0}
+#farbfeld{width:90px;height:90px;border-radius:8px;border:1px solid var(--linie)}
+#graufeld{width:90px;height:90px;border-radius:8px;border:1px solid var(--linie)}
+</style></head><body>
+<header class="kopf"><div class="ls">Lernsituation KI-Sichtprüfstation · Doppelstunde 2</div>
+<h1>Ein Bild ist für den Computer nur eine Tabelle voller Zahlen</h1></header>
+<main>
+<p>Die Kamera liefert keine „Formen“, sondern nur Zahlen: eine Zahl für die Helligkeit jedes Pixels. Zeichnen Sie mit der Maus ein Symbol in das Raster und beobachten Sie, welche Zahlen die KI bekommt.</p>
+
+<div class="reihe">
+ <div class="spalte" style="flex:0 0 340px">
+  <h2>1 · Zeichnen</h2>
+  <canvas id="zeichnung" width="320" height="320" style="border:1px solid var(--linie);border-radius:6px;cursor:crosshair"></canvas>
+  <div style="margin-top:6px">
+   <button class="aktiv" id="b-stift">Stift</button><button class="zweit" id="b-radierer">Radierer</button>
+  </div>
+  <div class="regler"><label>Stiftfarbe</label><input type="range" id="stift" min="0" max="200" value="30"><output id="stift-w">30</output></div>
+  <div>Vorlagen: <button class="zweit" data-vorlage="kreuz">Kreuz</button><button class="zweit" data-vorlage="kreis">Kreis</button><button class="zweit" data-vorlage="dreieck">Dreieck</button><button class="zweit" data-vorlage="quadrat">Quadrat</button></div>
+  <div><button class="zweit" id="b-leeren">Leeren</button><button class="zweit" id="b-rauschen">+ Bildrauschen</button><button class="zweit" id="b-schatten">+ Schatten</button></div>
+ </div>
+ <div class="spalte">
+  <h2>2 · Was die KI bekommt</h2>
+  <label><input type="radio" name="skala" value="255" checked> Werte 0 … 255 (uint8)</label>
+  <label style="margin-left:12px"><input type="radio" name="skala" value="1"> normiert 0 … 1 (÷ 255)</label>
+  <div style="margin-top:6px"><table id="matrix" class="mono"></table></div>
+  <p class="klein">0 = schwarz, 255 = weiß. Weißes Papier ≈ 230–255, Stiftlinie ≈ 20–60.</p>
+ </div>
+</div>
+
+<div class="reihe">
+ <div class="spalte karte">
+  <h2 style="margin-top:0">3 · Wie viele Zahlen hat ein Bild?</h2>
+  <div class="reihe" style="gap:8px">
+   <label>Breite <input type="number" id="r-b" value="32" min="1"></label>
+   <label>Höhe <input type="number" id="r-h" value="32" min="1"></label>
+   <label>Kanäle <select id="r-k"><option value="1">1 (grau)</option><option value="3">3 (RGB)</option></select></label>
+   <label>Bilder <input type="number" id="r-n" value="1735" min="1"></label>
+  </div>
+  <div style="margin:6px 0">
+   <button class="zweit" data-r="32,32,1">32×32 grau</button><button class="zweit" data-r="96,96,3">96×96 RGB</button><button class="zweit" data-r="224,224,3">224×224 RGB</button><button class="zweit" data-r="1920,1080,3">Full-HD Kamera</button>
+  </div>
+  <div id="r-erg"></div>
+ </div>
+ <div class="spalte karte">
+  <h2 style="margin-top:0">4 · Farbe → Graustufe</h2>
+  <div class="reihe" style="gap:12px;align-items:center">
+   <div style="flex:1">
+    <div class="regler"><label style="color:#c0392b">Rot R</label><input type="range" id="fr" min="0" max="255" value="40"><output id="fr-w"></output></div>
+    <div class="regler"><label style="color:#2e8b57">Grün G</label><input type="range" id="fg" min="0" max="255" value="60"><output id="fg-w"></output></div>
+    <div class="regler"><label style="color:#1f5f99">Blau B</label><input type="range" id="fb" min="0" max="255" value="170"><output id="fb-w"></output></div>
+   </div>
+   <div style="text-align:center"><div id="farbfeld"></div><span class="klein">RGB</span></div>
+   <div style="text-align:center"><div id="graufeld"></div><span class="klein">grau</span></div>
+  </div>
+  <div class="formel" id="grau-formel"></div>
+  <p class="klein">OpenCV gewichtet Grün am stärksten, weil das menschliche Auge dafür am empfindlichsten ist. Achtung: OpenCV speichert Farbbilder in der Reihenfolge <b>B, G, R</b>!</p>
+ </div>
+</div>
+
+<div class="auftrag"><b>Arbeitsauftrag</b>
+<ol>
+ <li>Laden Sie die Vorlage <i>Kreuz</i> und danach <i>Quadrat</i>. Welche Zahlen ändern sich? Woran könnte die KI die beiden Formen unterscheiden?</li>
+ <li>Fügen Sie Schatten und Rauschen hinzu. Warum macht das der KI Probleme? Was bedeutet das für die Beleuchtung der Prüfstation?</li>
+ <li>Berechnen Sie mit dem Rechner: Wie viel Speicher brauchen 1735 Full-HD-Farbbilder als float32? Passt das in einen Raspberry Pi mit 4 GB?</li>
+</ol></div>
+</main>
+<script>
+const N=16, Z=20;
+let bild=new Array(N*N).fill(245), modus='stift', malt=false;
+const cv=document.getElementById('zeichnung'), cx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+
+function zeichne(){
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++){const v=bild[i*N+j];cx.fillStyle=`rgb(${v},${v},${v})`;cx.fillRect(j*Z,i*Z,Z,Z);}
+  cx.strokeStyle='rgba(0,0,0,.08)';
+  for(let k=0;k<=N;k++){cx.beginPath();cx.moveTo(k*Z,0);cx.lineTo(k*Z,N*Z);cx.stroke();cx.beginPath();cx.moveTo(0,k*Z);cx.lineTo(N*Z,k*Z);cx.stroke();}
+  matrix();
+}
+function matrix(){
+  const norm=document.querySelector('input[name=skala]:checked').value==='1';
+  let h='';
+  for(let i=0;i<N;i++){h+='<tr>';for(let j=0;j<N;j++){const v=bild[i*N+j];const t=norm?(v/255).toFixed(2).replace('0.','.'):v;
+    h+=`<td style="background:rgb(${v},${v},${v});color:${v<128?'#fff':'#000'}">${t}</td>`;}h+='</tr>';}
+  $('matrix').innerHTML=h;
+}
+function setze(e){
+  const r=cv.getBoundingClientRect();
+  const x=(e.clientX-r.left)*cv.width/r.width, y=(e.clientY-r.top)*cv.height/r.height;
+  const j=Math.floor(x/Z), i=Math.floor(y/Z);
+  if(i<0||j<0||i>=N||j>=N)return;
+  bild[i*N+j]= modus==='stift' ? +$('stift').value : 245;
+  zeichne();
+}
+cv.addEventListener('pointerdown',e=>{malt=true;cv.setPointerCapture(e.pointerId);setze(e)});
+cv.addEventListener('pointermove',e=>{if(malt)setze(e)});
+cv.addEventListener('pointerup',()=>malt=false);
+$('stift').oninput=()=>$('stift-w').textContent=$('stift').value;
+$('b-stift').onclick=()=>{modus='stift';$('b-stift').className='aktiv';$('b-radierer').className='zweit'};
+$('b-radierer').onclick=()=>{modus='radierer';$('b-radierer').className='aktiv';$('b-stift').className='zweit'};
+$('b-leeren').onclick=()=>{bild.fill(245);zeichne()};
+$('b-rauschen').onclick=()=>{bild=bild.map(v=>Math.max(0,Math.min(255,Math.round(v+(Math.random()-.5)*60))));zeichne()};
+$('b-schatten').onclick=()=>{bild=bild.map((v,k)=>{const j=k%N;return Math.max(0,Math.round(v*(0.45+0.55*j/(N-1))))});zeichne()};
+document.querySelectorAll('input[name=skala]').forEach(r=>r.onchange=matrix);
+
+function vorlage(art){
+  bild.fill(245);const s=+$('stift').value||30;
+  const p=(i,j)=>{if(i>=0&&j>=0&&i<N&&j<N)bild[i*N+j]=s};
+  if(art==='kreuz'){for(let k=2;k<14;k++){p(k,7);p(7,k)}}
+  if(art==='quadrat'){for(let k=3;k<13;k++){p(3,k);p(12,k);p(k,3);p(k,12)}}
+  if(art==='kreis'){for(let a=0;a<360;a+=4){const r=5.5;p(Math.round(7.5+r*Math.sin(a*Math.PI/180)),Math.round(7.5+r*Math.cos(a*Math.PI/180)))}}
+  if(art==='dreieck'){for(let k=0;k<=10;k++){p(13,2+k+1);} for(let k=0;k<=10;k++){const i=13-k;const d=k/2;p(i,Math.round(3+d));p(i,Math.round(13-d))}}
+  zeichne();
+}
+document.querySelectorAll('[data-vorlage]').forEach(b=>b.onclick=()=>vorlage(b.dataset.vorlage));
+
+function fmt(n){return n.toLocaleString('de-DE')}
+function mb(b){const f=(x,d)=>x.toLocaleString('de-DE',{maximumFractionDigits:d});return b>=1e9?f(b/1e9,2)+' GB':b>=1e6?f(b/1e6,1)+' MB':f(b/1e3,1)+' kB'}
+function rechne(){
+  const b=+$('r-b').value,h=+$('r-h').value,k=+$('r-k').value,n=+$('r-n').value;
+  const w=b*h*k;
+  $('r-erg').innerHTML=`<div class="formel">${b} × ${h} × ${k} = <b>${fmt(w)}</b> Zahlen pro Bild</div>
+  <table class="daten" style="margin-top:6px"><tr><th></th><th>1 Bild</th><th>${fmt(n)} Bilder</th></tr>
+  <tr><td>uint8 (1 Byte)</td><td>${mb(w)}</td><td>${mb(w*n)}</td></tr>
+  <tr><td>float32 (4 Byte)</td><td>${mb(w*4)}</td><td class="${w*4*n>2e9?'schlecht':''}">${mb(w*4*n)}</td></tr></table>`;
+}
+['r-b','r-h','r-k','r-n'].forEach(i=>$(i).oninput=rechne);
+document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{const [x,y,k]=b.dataset.r.split(',');$('r-b').value=x;$('r-h').value=y;$('r-k').value=k;rechne()});
+
+function farbe(){
+  const r=+$('fr').value,g=+$('fg').value,b=+$('fb').value;
+  $('fr-w').textContent=r;$('fg-w').textContent=g;$('fb-w').textContent=b;
+  const y=Math.round(0.299*r+0.587*g+0.114*b);
+  $('farbfeld').style.background=`rgb(${r},${g},${b})`;$('graufeld').style.background=`rgb(${y},${y},${y})`;
+  $('grau-formel').textContent=`grau = 0,299·${r} + 0,587·${g} + 0,114·${b} = ${y}`;
+}
+['fr','fg','fb'].forEach(i=>$(i).oninput=farbe);
+vorlage('kreuz');rechne();farbe();
+</script>
+</body></html>

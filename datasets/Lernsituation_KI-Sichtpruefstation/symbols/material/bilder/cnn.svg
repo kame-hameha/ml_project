@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 330" font-family="system-ui,Segoe UI,Roboto,Ubuntu,sans-serif">
+<defs><marker id="pf" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5f6b76"/></marker></defs>
+<rect width="980" height="330" fill="#fff"/>
+<text x="490" y="26" text-anchor="middle" font-size="18" font-weight="700" fill="#1f5f99">Faltungsnetz (CNN): Merkmale werden Schicht für Schicht abstrakter</text>
+<!-- Eingabe -->
+<g transform="translate(25,70)"><rect x="12" y="12" width="130" height="130" fill="#c9dbe9" stroke="#5f6b76"/><rect x="6" y="6" width="130" height="130" fill="#dfe9d9" stroke="#5f6b76"/><rect width="130" height="130" fill="#f6e3e0" stroke="#5f6b76"/>
+<path d="M65,25 L105,100 L25,100 z" fill="none" stroke="#1d2833" stroke-width="6"/></g>
+<text x="96" y="240" text-anchor="middle" font-size="13" font-weight="600">Eingabe</text><text x="96" y="257" text-anchor="middle" font-size="12" fill="#5f6b76">96 × 96 × 3</text>
+<!-- Block 1 -->
+<g fill="#e8f0f8" stroke="#1f5f99"><rect x="215" y="80" width="96" height="96"/><rect x="221" y="86" width="96" height="96"/><rect x="227" y="92" width="96" height="96"/><rect x="233" y="98" width="96" height="96"/></g>
+<path d="M245,150 L280,150 M262,125 L262,180" stroke="#1f5f99" stroke-width="4" opacity=".5"/>
+<text x="272" y="240" text-anchor="middle" font-size="13" font-weight="600">Conv 16 + Pool</text><text x="272" y="257" text-anchor="middle" font-size="12" fill="#5f6b76">48 × 48 × 16</text>
+<text x="272" y="275" text-anchor="middle" font-size="12" fill="#d9731a">Kanten</text>
+<!-- Block 2 -->
+<g fill="#e8f0f8" stroke="#1f5f99"><rect x="385" y="105" width="62" height="62"/><rect x="390" y="110" width="62" height="62"/><rect x="395" y="115" width="62" height="62"/><rect x="400" y="120" width="62" height="62"/><rect x="405" y="125" width="62" height="62"/><rect x="410" y="130" width="62" height="62"/></g>
+<text x="430" y="240" text-anchor="middle" font-size="13" font-weight="600">Conv 32 + Pool</text><text x="430" y="257" text-anchor="middle" font-size="12" fill="#5f6b76">24 × 24 × 32</text>
+<text x="430" y="275" text-anchor="middle" font-size="12" fill="#d9731a">Ecken, Bögen</text>
+<!-- Block 3 -->
+<g fill="#e8f0f8" stroke="#1f5f99"><rect x="540" y="125" width="34" height="34"/><rect x="544" y="129" width="34" height="34"/><rect x="548" y="133" width="34" height="34"/><rect x="552" y="137" width="34" height="34"/><rect x="556" y="141" width="34" height="34"/><rect x="560" y="145" width="34" height="34"/><rect x="564" y="149" width="34" height="34"/><rect x="568" y="153" width="34" height="34"/></g>
+<text x="572" y="240" text-anchor="middle" font-size="13" font-weight="600">Conv 64 + Pool</text><text x="572" y="257" text-anchor="middle" font-size="12" fill="#5f6b76">12 × 12 × 64</text>
+<text x="572" y="275" text-anchor="middle" font-size="12" fill="#d9731a">Formteile</text>
+<!-- GAP -->
+<rect x="672" y="80" width="18" height="140" rx="4" fill="#cfd8e2" stroke="#5f6b76"/>
+<text x="681" y="240" text-anchor="middle" font-size="13" font-weight="600">Global-</text><text x="681" y="256" text-anchor="middle" font-size="13" font-weight="600">AvgPool</text><text x="681" y="273" text-anchor="middle" font-size="12" fill="#5f6b76">1 Wert je Karte</text>
+<!-- Dense -->
+<g fill="#fff7ec" stroke="#d9731a" stroke-width="2"><circle cx="790" cy="100" r="12"/><circle cx="790" cy="130" r="12"/><circle cx="790" cy="170" r="12"/><circle cx="790" cy="200" r="12"/></g>
+<g stroke="#9fb6cc" stroke-width="0.8"><path d="M690,95 L778,100 M690,95 L778,200 M690,205 L778,100 M690,205 L778,200 M690,150 L778,130 M690,150 L778,170"/></g>
+<g font-size="13"><text x="812" y="104">Kreuz</text><text x="812" y="134">Kreis</text><text x="812" y="174" font-weight="700" fill="#d9731a">Dreieck 0,97</text><text x="812" y="204">Quadrat</text></g>
+<text x="790" y="240" text-anchor="middle" font-size="13" font-weight="600">Dense(4, softmax)</text>
+<g stroke="#5f6b76" stroke-width="2" marker-end="url(#pf)"><path d="M172,140 L205,140"/><path d="M340,145 L376,145"/><path d="M478,155 L530,155"/><path d="M607,165 L664,160"/></g>
+<rect x="25" y="290" width="930" height="32" rx="8" fill="#e8f0f8"/>
+<text x="490" y="311" text-anchor="middle" font-size="13">Jeder Filter (3 × 3) wird über das ganze Bild geschoben → gleiche Gewichte überall → wenige Parameter, robust gegen Verschiebung</text>
+</svg>

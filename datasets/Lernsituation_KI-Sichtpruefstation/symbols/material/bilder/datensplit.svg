@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200" font-family="system-ui,Segoe UI,Roboto,Ubuntu,sans-serif">
+<rect width="900" height="200" fill="#fff"/>
+<text x="450" y="26" text-anchor="middle" font-size="18" font-weight="700" fill="#1f5f99">Aufteilung des Datensatzes (geschichtet = gleiche Klassenanteile)</text>
+<rect x="30" y="45" width="588" height="56" fill="#1f5f99"/><rect x="618" y="45" width="126" height="56" fill="#d9731a"/><rect x="744" y="45" width="126" height="56" fill="#2e8b57"/>
+<g fill="#fff" font-size="16" font-weight="700" text-anchor="middle"><text x="324" y="79">Training 70 %</text><text x="681" y="70" font-size="14">Validierung</text><text x="681" y="90" font-size="14">15 %</text><text x="807" y="70" font-size="14">Test</text><text x="807" y="90" font-size="14">15 %</text></g>
+<g font-size="13" fill="#1d2833">
+<text x="30" y="128" font-weight="600" fill="#1f5f99">Daraus lernt das Netz</text>
+<text x="30" y="148">Gewichte werden angepasst · Augmentierung nur hier</text>
+<text x="618" y="128" font-weight="600" fill="#d9731a">Steuert das Training</text>
+<text x="618" y="148">EarlyStopping,</text><text x="618" y="166">Hyperparameter</text>
+<text x="744" y="128" font-weight="600" fill="#2e8b57">Abschlussprüfung</text>
+<text x="744" y="148">nur einmal am Ende,</text><text x="744" y="166">nie zum Einstellen</text>
+</g>
+<text x="30" y="192" font-size="12" fill="#5f6b76">Vergleich: Übungsaufgaben (Training) · Probeklausur (Validierung) · echte Prüfung mit unbekannten Aufgaben (Test)</text>
+</svg>

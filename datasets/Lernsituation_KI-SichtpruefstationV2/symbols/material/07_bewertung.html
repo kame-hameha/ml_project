@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modelle bewerten: Konfusionsmatrix und Fehlerkosten</title>
+<style>:root{--blau:#1f5f99;--blau-hell:#e8f0f8;--orange:#d9731a;--gruen:#2e8b57;--rot:#c0392b;--grau:#5f6b76;--linie:#d5dde5;--hg:#f7f9fb}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif;color:#1d2833;background:#fff;line-height:1.45;font-size:15px}
+header.kopf{background:var(--blau);color:#fff;padding:12px 18px}
+header.kopf .ls{font-size:12px;opacity:.85;letter-spacing:.03em;text-transform:uppercase}
+header.kopf h1{margin:2px 0 0;font-size:21px;font-weight:650}
+main{padding:14px 18px 22px;max-width:1100px;margin:0 auto}
+h2{font-size:17px;margin:18px 0 8px;color:var(--blau)}
+p{margin:6px 0}
+.karte{background:var(--hg);border:1px solid var(--linie);border-radius:10px;padding:12px 14px;margin:10px 0}
+.auftrag{background:#fff7ec;border:1px solid #f1d2ad;border-left:5px solid var(--orange);border-radius:8px;padding:10px 14px;margin:12px 0}
+.auftrag b:first-child{color:var(--orange)}
+.info{background:var(--blau-hell);border-left:5px solid var(--blau);border-radius:8px;padding:10px 14px;margin:10px 0}
+.reihe{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.spalte{flex:1 1 300px;min-width:260px}
+button,select,input{font:inherit}
+button{background:var(--blau);color:#fff;border:0;border-radius:6px;padding:6px 12px;cursor:pointer;margin:2px}
+button:hover{filter:brightness(1.12)}
+button.zweit{background:#fff;color:var(--blau);border:1px solid var(--blau)}
+button.aktiv{background:var(--orange)}
+input[type=range]{width:100%;accent-color:var(--blau)}
+input[type=number]{width:90px;padding:3px 5px;border:1px solid var(--linie);border-radius:5px}
+select{padding:4px 6px;border:1px solid var(--linie);border-radius:5px;background:#fff}
+label{font-size:14px}
+.regler{display:grid;grid-template-columns:110px 1fr 64px;gap:6px;align-items:center;margin:4px 0}
+.regler output{font-variant-numeric:tabular-nums;text-align:right;font-weight:600}
+.mono{font-family:ui-monospace,"DejaVu Sans Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+.formel{font-family:ui-monospace,"DejaVu Sans Mono",Consolas,monospace;background:#fff;border:1px solid var(--linie);border-radius:6px;padding:8px 10px;white-space:normal;overflow-wrap:anywhere}
+.gut{color:var(--gruen);font-weight:600}
+.schlecht{color:var(--rot);font-weight:600}
+.klein{font-size:13px;color:var(--grau)}
+table.daten{border-collapse:collapse;font-size:14px}
+table.daten td,table.daten th{border:1px solid var(--linie);padding:4px 8px;text-align:center}
+table.daten th{background:var(--blau-hell)}
+canvas{touch-action:none;max-width:100%}
+details{margin:8px 0}
+summary{cursor:pointer;color:var(--blau);font-weight:600}
+
+.km{border-collapse:collapse;font-size:15px}
+.km td,.km th{border:1px solid var(--linie);padding:6px 10px;text-align:center}
+.km th{background:var(--blau-hell);font-weight:600}
+.km td.diag{background:#e3f4ea}
+.km td.fehler{background:#fbe4e1}
+.km input{width:58px;text-align:center}
+.kennzahl{display:inline-block;min-width:150px;margin:4px 8px 4px 0;padding:8px 10px;background:#fff;border:1px solid var(--linie);border-radius:8px}
+.kennzahl b{font-size:20px;display:block}
+</style></head><body>
+<header class="kopf"><div class="ls">Lernsituation KI-Sichtprüfstation · Doppelstunde 7</div>
+<h1>Ist das Modell gut genug für die Fertigung? Konfusionsmatrix und Fehlerkosten</h1></header>
+<main>
+<p>Eine einzige Zahl wie „95 % Genauigkeit“ reicht in der Produktion nicht. Entscheidend ist, <b>welche</b> Fehler passieren und was sie <b>kosten</b>. Ein fehlerhaftes Teil, das zum Kunden gelangt (<b>Schlupf</b>), ist meist viel teurer als ein gutes Teil, das unnötig aussortiert wird (<b>Pseudoausschuss</b>).</p>
+
+<h2>1 · Gut-/Schlecht-Prüfung mit Entscheidungsschwelle</h2>
+<div class="reihe">
+ <div class="spalte" style="flex:0 1 340px">
+  <div class="regler"><label>Schwelle</label><input type="range" id="s" min="0.01" max="0.99" step="0.01" value="0.5"><output id="s-w"></output></div>
+  <div class="regler"><label>Trennschärfe</label><input type="range" id="q" min="0.5" max="4" step="0.1" value="2"><output id="q-w"></output></div>
+  <div class="regler"><label>Fehleranteil</label><input type="range" id="a" min="0.01" max="0.3" step="0.01" value="0.05"><output id="a-w"></output></div>
+  <label>Teile pro Schicht <input type="number" id="n" value="2000"></label><br>
+  <label>Kosten Schlupf € <input type="number" id="ks" value="250"></label><br>
+  <label>Kosten Pseudoausschuss € <input type="number" id="kp" value="8"></label>
+  <div style="margin-top:6px"><button id="opt">Kostenoptimale Schwelle suchen</button></div>
+ </div>
+ <div class="spalte">
+  <canvas id="vert" width="640" height="220" style="width:100%"></canvas>
+  <p class="klein">Das Modell gibt für jedes Teil eine Wahrscheinlichkeit „fehlerhaft“ aus. Liegt sie über der Schwelle, wird das Teil ausgeschleust. Grün: gute Teile, rot: fehlerhafte Teile.</p>
+ </div>
+</div>
+<div class="reihe">
+ <div class="spalte">
+  <table class="km" id="km2"></table>
+ </div>
+ <div class="spalte" id="kz2"></div>
+</div>
+
+<h2>2 · Konfusionsmatrix für mehrere Klassen</h2>
+<p>Tragen Sie die Werte aus Ihrem Notebook ein (Zeile = tatsächliche Klasse, Spalte = Vorhersage).</p>
+<div class="reihe">
+ <div class="spalte"><table class="km" id="km4"></table>
+  <div style="margin-top:6px"><button class="zweit" id="bsp1">Beispiel FCNN</button><button class="zweit" id="bsp2">Beispiel CNN</button><button class="zweit" id="null">Leeren</button></div></div>
+ <div class="spalte"><table class="daten" id="bericht"></table><div id="acc4" style="margin-top:8px"></div></div>
+</div>
+<div class="info">
+ <b>Precision</b> (Präzision): Von allen Teilen, die das Modell als Klasse X einsortiert, wie viele sind wirklich X?<br>
+ <b>Recall</b> (Trefferquote): Von allen echten X, wie viele hat das Modell gefunden?<br>
+ <b>F1</b>: harmonisches Mittel aus beiden. <b>Accuracy</b>: Anteil aller richtigen Entscheidungen.
+</div>
+
+<div class="auftrag"><b>Arbeitsauftrag</b>
+<ol>
+ <li>Bei Schwelle 0,5: Wie viele fehlerhafte Teile pro Schicht gelangen zum Kunden? Was kostet das?</li>
+ <li>Suchen Sie die kostenoptimale Schwelle. Warum liegt sie <i>unter</i> 0,5? Wie verändert sie sich, wenn Schlupf nur 20 € kostet?</li>
+ <li>Stellen Sie den Fehleranteil auf 1 %. Ein Modell, das <i>immer</i> „i. O.“ sagt, hätte dann 99 % Accuracy. Warum ist es trotzdem unbrauchbar? Welche Kennzahl zeigt das?</li>
+ <li>Tragen Sie die Konfusionsmatrix Ihres CNN aus Notebook 12 ein. Welche zwei Klassen werden am häufigsten verwechselt? Nennen Sie eine mögliche Ursache und eine Gegenmaßnahme bei der Datenaufnahme.</li>
+</ol></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const f=(x,d=1)=>(+x).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct=x=>isFinite(x)?f(x*100,1)+' %':'–';
+// Scores: logistische Verteilungen um +-q (Trennschaerfe) auf der Logit-Achse
+const sig=x=>1/(1+Math.exp(-x)), logit=p=>Math.log(p/(1-p));
+const Phi=x=>{const t=1/(1+0.2316419*Math.abs(x)),d=0.3989423*Math.exp(-x*x/2);const p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p};
+function lies(){return{s:+$('s').value,q:+$('q').value,a:+$('a').value,n:+$('n').value,ks:+$('ks').value,kp:+$('kp').value}}
+function werte(p){
+  const t=logit(p.s);const anteilFalschAlarm=1-Phi(t+p.q);const anteilErkannt=1-Phi(t-p.q);
+  const schlecht=p.n*p.a,gut=p.n-schlecht;
+  const TP=schlecht*anteilErkannt,FN=schlecht-TP,FP=gut*anteilFalschAlarm,TN=gut-FP;
+  return{TP,FN,FP,TN,kosten:FN*p.ks+FP*p.kp};
+}
+function zeichne(p){
+  const c=$('vert'),g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);
+  const X=s=>30+s*(W-50),dens=(s,m)=>{const x=logit(s);return Math.exp(-((x-m)**2)/2)/(s*(1-s))};
+  const kurven=[[-p.q,'46,139,87',1-p.a],[p.q,'192,57,43',p.a*6]];let maxv=0;
+  const pts=kurven.map(([m,,w])=>{const a=[];for(let i=1;i<300;i++){const s=i/300;const v=dens(s,m)*w;a.push([s,v]);maxv=Math.max(maxv,v)}return a});
+  pts.forEach((a,k)=>{g.fillStyle=`rgba(${kurven[k][1]},.25)`;g.strokeStyle=`rgb(${kurven[k][1]})`;g.lineWidth=2;g.beginPath();g.moveTo(X(a[0][0]),H-24);
+    a.forEach(([s,v])=>g.lineTo(X(s),H-24-v/maxv*(H-40)));g.lineTo(X(a.at(-1)[0]),H-24);g.closePath();g.fill();g.stroke()});
+  g.strokeStyle='#1d2833';g.setLineDash([6,4]);g.beginPath();g.moveTo(X(p.s),8);g.lineTo(X(p.s),H-24);g.stroke();g.setLineDash([]);
+  g.fillStyle='#555';g.font='12px sans-serif';for(let k=0;k<=10;k++)g.fillText(f(k/10,1),X(k/10)-9,H-6);
+  g.fillStyle='#1d2833';g.fillText('← i. O. (durchlassen)',Math.max(4,X(p.s)-140),18);g.fillText('ausschleusen →',Math.min(W-100,X(p.s)+8),18);
+  g.fillStyle='#c0392b';g.fillText('fehlerhafte Teile (Höhe ×6 vergrößert)',W-260,36);
+}
+function update(){
+  const p=lies();$('s-w').textContent=f(p.s,2);$('q-w').textContent=f(p.q,1);$('a-w').textContent=f(p.a*100,0)+' %';
+  zeichne(p);const v=werte(p);const r=x=>Math.round(x).toLocaleString('de-DE');
+  $('km2').innerHTML=`<tr><th rowspan="2">tatsächlich</th><th colspan="2">Entscheidung der Prüfstation</th></tr>
+  <tr><th>i. O. (durchlassen)</th><th>n. i. O. (ausschleusen)</th></tr>
+  <tr><th>gutes Teil</th><td class="diag">${r(v.TN)}<br><span class="klein">richtig durchgelassen</span></td><td class="fehler">${r(v.FP)}<br><span class="klein">Pseudoausschuss</span></td></tr>
+  <tr><th>fehlerhaftes Teil</th><td class="fehler">${r(v.FN)}<br><span class="klein"><b>Schlupf</b></span></td><td class="diag">${r(v.TP)}<br><span class="klein">richtig erkannt</span></td></tr>`;
+  const acc=(v.TP+v.TN)/p.n,rec=v.TP/(v.TP+v.FN),pre=v.TP/(v.TP+v.FP);
+  $('kz2').innerHTML=`<span class="kennzahl">Accuracy<b>${pct(acc)}</b></span><span class="kennzahl">Recall n. i. O.<b>${pct(rec)}</b><span class="klein">Fehler gefunden</span></span><span class="kennzahl">Precision n. i. O.<b>${pct(pre)}</b><span class="klein">Ausschuss ist wirklich schlecht</span></span><span class="kennzahl">Kosten je Schicht<b>${r(v.kosten)} €</b><span class="klein">Schlupf ${r(v.FN*p.ks)} € · Pseudo ${r(v.FP*p.kp)} €</span></span>`;
+}
+['s','q','a','n','ks','kp'].forEach(i=>$(i).oninput=update);
+$('opt').onclick=()=>{const p=lies();let best=0.5,bk=Infinity;for(let s=0.01;s<0.995;s+=0.005){const k=werte({...p,s}).kosten;if(k<bk){bk=k;best=s}}$('s').value=best.toFixed(2);update()};
+
+const K=['Kreuz','Kreis','Dreieck','Quadrat'];
+const BSP={bsp1:[[52,3,9,2],[4,48,3,10],[11,2,47,7],[3,12,6,45]],bsp2:[[64,0,2,0],[0,62,0,3],[3,0,63,1],[0,4,1,61]]};
+let M=BSP.bsp2.map(r=>[...r]);
+function baue4(){
+  let h='<tr><th>tatsächlich ↓ / Vorhersage →</th>'+K.map(k=>`<th>${k}</th>`).join('')+'</tr>';
+  K.forEach((k,i)=>{h+=`<tr><th>${k}</th>`+K.map((_,j)=>`<td class="${i===j?'diag':(M[i][j]>0?'fehler':'')}"><input type="number" min="0" data-i="${i}" data-j="${j}" value="${M[i][j]}"></td>`).join('')+'</tr>'});
+  $('km4').innerHTML=h;$('km4').querySelectorAll('input').forEach(e=>e.oninput=()=>{M[+e.dataset.i][+e.dataset.j]=Math.max(0,+e.value||0);bericht();e.parentElement.className=(e.dataset.i===e.dataset.j)?'diag':(M[+e.dataset.i][+e.dataset.j]>0?'fehler':'')});
+  bericht();
+}
+function bericht(){
+  let h='<tr><th>Klasse</th><th>Precision</th><th>Recall</th><th>F1</th><th>Anzahl</th></tr>',richtig=0,ges=0;
+  K.forEach((k,i)=>{const tp=M[i][i],zeile=M[i].reduce((a,b)=>a+b,0),spalte=M.reduce((a,r)=>a+r[i],0);
+    const p=tp/spalte,r=tp/zeile,f1=2*p*r/(p+r);richtig+=tp;ges+=zeile;
+    h+=`<tr><td>${k}</td><td>${pct(p)}</td><td>${pct(r)}</td><td>${pct(f1)}</td><td>${zeile}</td></tr>`});
+  $('bericht').innerHTML=h;
+  let maxv=-1,paar='';K.forEach((a,i)=>K.forEach((b,j)=>{if(i!==j&&M[i][j]>maxv){maxv=M[i][j];paar=`${a} → ${b}`}}));
+  $('acc4').innerHTML=`<span class="kennzahl">Accuracy<b>${pct(richtig/ges)}</b><span class="klein">${richtig} von ${ges} richtig</span></span><span class="kennzahl">Häufigste Verwechslung<b style="font-size:16px">${maxv>0?paar+' ('+maxv+'×)':'keine'}</b></span>`;
+}
+document.querySelectorAll('#bsp1,#bsp2').forEach(b=>b.onclick=()=>{M=BSP[b.id].map(r=>[...r]);baue4()});
+$('null').onclick=()=>{M=K.map(()=>K.map(()=>0));baue4()};
+update();baue4();
+</script>
+</body></html>

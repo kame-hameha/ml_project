@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" font-family="system-ui,Segoe UI,Roboto,Ubuntu,sans-serif">
+<defs><marker id="pf" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5f6b76"/></marker></defs>
+<rect width="960" height="330" fill="#fff"/>
+<text x="480" y="26" text-anchor="middle" font-size="18" font-weight="700" fill="#1f5f99">Vollvernetztes Netz (FCNN / MLP) für 32 × 32-Graubilder</text>
+<!-- Bild -->
+<g transform="translate(30,90)"><rect width="110" height="110" fill="#f4f6f8" stroke="#5f6b76"/>
+<path d="M25,55 L85,55 M55,22 L55,90" stroke="#1d2833" stroke-width="7"/>
+<g stroke="#d5dde5" stroke-width="0.6">
+<path d="M0,13.75H110M0,27.5H110M0,41.25H110M0,55H110M0,68.75H110M0,82.5H110M0,96.25H110M13.75,0V110M27.5,0V110M41.25,0V110M55,0V110M68.75,0V110M82.5,0V110M96.25,0V110"/></g></g>
+<text x="85" y="225" text-anchor="middle" font-size="13">Bild 32 × 32 × 1</text>
+<text x="85" y="243" text-anchor="middle" font-size="12" fill="#5f6b76">Rescaling ÷ 255</text>
+<path d="M148,145 L188,145" stroke="#5f6b76" stroke-width="2" marker-end="url(#pf)"/>
+<!-- Flatten -->
+<g fill="#cfd8e2" stroke="#5f6b76"><rect x="200" y="50" width="22" height="190" rx="4"/></g>
+<g fill="#1d2833"><circle cx="211" cy="62" r="4"/><circle cx="211" cy="76" r="4"/><circle cx="211" cy="90" r="4"/><circle cx="211" cy="200" r="4"/><circle cx="211" cy="214" r="4"/><circle cx="211" cy="228" r="4"/></g>
+<text x="211" y="150" text-anchor="middle" font-size="16">⋮</text>
+<text x="211" y="262" text-anchor="middle" font-size="13" font-weight="600">Flatten</text><text x="211" y="280" text-anchor="middle" font-size="12" fill="#5f6b76">1024 Werte</text>
+<!-- Dense Schichten -->
+<g id="v" stroke="#9fb6cc" stroke-width="0.7" opacity=".7">
+<path d="M222,62 L380,75 M222,62 L380,215 M222,228 L380,75 M222,228 L380,215 M222,90 L380,145 M222,200 L380,110 M222,145 L380,180"/>
+<path d="M392,75 L540,100 M392,215 L540,190 M392,75 L540,190 M392,215 L540,100 M392,145 L540,145"/>
+<path d="M552,100 L700,95 M552,190 L700,195 M552,100 L700,195 M552,190 L700,95 M552,145 L700,125 M552,145 L700,165"/>
+</g>
+<g fill="#e8f0f8" stroke="#1f5f99" stroke-width="2">
+<circle cx="386" cy="75" r="11"/><circle cx="386" cy="110" r="11"/><circle cx="386" cy="180" r="11"/><circle cx="386" cy="215" r="11"/>
+<circle cx="546" cy="100" r="11"/><circle cx="546" cy="145" r="11"/><circle cx="546" cy="190" r="11"/>
+</g>
+<text x="386" y="150" text-anchor="middle" font-size="16">⋮</text>
+<g fill="#fff7ec" stroke="#d9731a" stroke-width="2"><circle cx="706" cy="95" r="12"/><circle cx="706" cy="125" r="12"/><circle cx="706" cy="165" r="12"/><circle cx="706" cy="195" r="12"/></g>
+<g font-size="13" text-anchor="middle"><text x="386" y="262" font-weight="600">Dense(128, relu)</text><text x="386" y="280" fill="#5f6b76" font-size="12">131 200 Parameter</text>
+<text x="546" y="262" font-weight="600">Dense(64, relu)</text><text x="546" y="280" fill="#5f6b76" font-size="12">8 256 Parameter</text>
+<text x="706" y="262" font-weight="600">Dense(4, softmax)</text><text x="706" y="280" fill="#5f6b76" font-size="12">260 Parameter</text></g>
+<g font-size="13"><text x="728" y="99">Kreuz</text><text x="728" y="129">Kreis</text><text x="728" y="169">Dreieck</text><text x="728" y="199">Quadrat</text></g>
+<g font-size="13" font-weight="700" fill="#d9731a"><text x="800" y="99">0,91</text><text x="800" y="129">0,03</text><text x="800" y="169">0,04</text><text x="800" y="199">0,02</text></g>
+<text x="850" y="150" font-size="12" fill="#5f6b76">Summe = 1</text>
+<text x="480" y="314" text-anchor="middle" font-size="12" fill="#5f6b76">Nachteil: Jedes Pixel hat sein eigenes Gewicht – verschiebt sich das Symbol, sieht das Netz „ganz andere“ Eingänge.</text>
+</svg>

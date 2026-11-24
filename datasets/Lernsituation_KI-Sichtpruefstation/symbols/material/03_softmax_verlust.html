@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Softmax, One-Hot und Verlust</title>
+<style>:root{--blau:#1f5f99;--blau-hell:#e8f0f8;--orange:#d9731a;--gruen:#2e8b57;--rot:#c0392b;--grau:#5f6b76;--linie:#d5dde5;--hg:#f7f9fb}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif;color:#1d2833;background:#fff;line-height:1.45;font-size:15px}
+header.kopf{background:var(--blau);color:#fff;padding:12px 18px}
+header.kopf .ls{font-size:12px;opacity:.85;letter-spacing:.03em;text-transform:uppercase}
+header.kopf h1{margin:2px 0 0;font-size:21px;font-weight:650}
+main{padding:14px 18px 22px;max-width:1100px;margin:0 auto}
+h2{font-size:17px;margin:18px 0 8px;color:var(--blau)}
+p{margin:6px 0}
+.karte{background:var(--hg);border:1px solid var(--linie);border-radius:10px;padding:12px 14px;margin:10px 0}
+.auftrag{background:#fff7ec;border:1px solid #f1d2ad;border-left:5px solid var(--orange);border-radius:8px;padding:10px 14px;margin:12px 0}
+.auftrag b:first-child{color:var(--orange)}
+.info{background:var(--blau-hell);border-left:5px solid var(--blau);border-radius:8px;padding:10px 14px;margin:10px 0}
+.reihe{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.spalte{flex:1 1 300px;min-width:260px}
+button,select,input{font:inherit}
+button{background:var(--blau);color:#fff;border:0;border-radius:6px;padding:6px 12px;cursor:pointer;margin:2px}
+button:hover{filter:brightness(1.12)}
+button.zweit{background:#fff;color:var(--blau);border:1px solid var(--blau)}
+button.aktiv{background:var(--orange)}
+input[type=range]{width:100%;accent-color:var(--blau)}
+input[type=number]{width:90px;padding:3px 5px;border:1px solid var(--linie);border-radius:5px}
+select{padding:4px 6px;border:1px solid var(--linie);border-radius:5px;background:#fff}
+label{font-size:14px}
+.regler{display:grid;grid-template-columns:110px 1fr 64px;gap:6px;align-items:center;margin:4px 0}
+.regler output{font-variant-numeric:tabular-nums;text-align:right;font-weight:600}
+.mono{font-family:ui-monospace,"DejaVu Sans Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+.formel{font-family:ui-monospace,"DejaVu Sans Mono",Consolas,monospace;background:#fff;border:1px solid var(--linie);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+.gut{color:var(--gruen);font-weight:600}
+.schlecht{color:var(--rot);font-weight:600}
+.klein{font-size:13px;color:var(--grau)}
+table.daten{border-collapse:collapse;font-size:14px}
+table.daten td,table.daten th{border:1px solid var(--linie);padding:4px 8px;text-align:center}
+table.daten th{background:var(--blau-hell)}
+canvas{touch-action:none;max-width:100%}
+details{margin:8px 0}
+summary{cursor:pointer;color:var(--blau);font-weight:600}
+
+.balken{display:grid;grid-template-columns:90px 1fr 62px;gap:8px;align-items:center;margin:5px 0}
+.balken .spur{background:#eef1f4;border-radius:5px;height:24px;position:relative;overflow:hidden}
+.balken .fuell{height:100%;background:var(--blau);border-radius:5px;transition:width .15s}
+.balken.wahr .fuell{background:var(--gruen)}
+.onehot{display:inline-block;min-width:34px;text-align:center;border:1px solid var(--linie);border-radius:4px;margin:2px;padding:2px 4px}
+.onehot.eins{background:var(--gruen);color:#fff}
+#verlust-zahl{font-size:30px;font-weight:700}
+</style></head><body>
+<header class="kopf"><div class="ls">Lernsituation KI-Sichtprüfstation · Doppelstunde 3</div>
+<h1>Von Rohwerten zu Wahrscheinlichkeiten – und wie „falsch“ das Netz liegt</h1></header>
+<main>
+<p>Die letzte Schicht hat <b>ein Neuron pro Klasse</b>. Ihre Rohwerte (Logits) können beliebige Zahlen sein. <b>Softmax</b> macht daraus Wahrscheinlichkeiten, die zusammen 100 % ergeben. Der <b>Verlust (Loss)</b> misst, wie wenig Wahrscheinlichkeit das Netz der richtigen Klasse gibt.</p>
+
+<div class="reihe">
+ <div class="spalte">
+  <h2>1 · Rohwerte der Ausgabeschicht (Logits z)</h2>
+  <div id="regler"></div>
+  <div style="margin-top:8px">Schnellwahl:
+   <button class="zweit" data-fall="sicher">sicher &amp; richtig</button>
+   <button class="zweit" data-fall="unsicher">unsicher</button>
+   <button class="zweit" data-fall="falsch">sicher &amp; falsch</button>
+   <button class="zweit" data-fall="gleich">alle gleich</button></div>
+  <h2>2 · Softmax</h2>
+  <div class="formel">p<sub>i</sub> = e<sup>z<sub>i</sub></sup> / (e<sup>z<sub>1</sub></sup> + e<sup>z<sub>2</sub></sup> + … + e<sup>z<sub>n</sub></sup>)</div>
+  <div id="summe" class="klein" style="margin-top:4px"></div>
+ </div>
+ <div class="spalte">
+  <h2>3 · Ausgabe des Netzes</h2>
+  <div id="balken"></div>
+  <p>Vorhersage (größte Wahrscheinlichkeit, <span class="mono">argmax</span>): <b id="vorhersage"></b></p>
+  <h2>4 · Richtige Klasse (Label) als One-Hot-Vektor</h2>
+  <select id="wahr"></select>
+  <div id="onehot" style="margin-top:6px"></div>
+  <div class="karte">
+   <div>Kreuzentropie-Verlust = −ln(p<sub>richtig</sub>)</div>
+   <div id="verlust-zahl" class="mono"></div>
+   <div id="verlust-text"></div>
+  </div>
+ </div>
+</div>
+
+<div class="karte">
+ <h2 style="margin-top:0">Verlust in Abhängigkeit von der Wahrscheinlichkeit der richtigen Klasse</h2>
+ <canvas id="kurve" width="900" height="200" style="width:100%"></canvas>
+ <p class="klein">Ist das Netz sicher und falsch (p<sub>richtig</sub> nahe 0), wird der Verlust sehr groß – genau dann werden die Gewichte beim Training am stärksten korrigiert.</p>
+</div>
+
+<div class="auftrag"><b>Arbeitsauftrag</b>
+<ol>
+ <li>Erhöhe alle Logits gleichzeitig um denselben Betrag. Was passiert mit den Wahrscheinlichkeiten? Warum?</li>
+ <li>Stelle „sicher &amp; richtig“ und „sicher &amp; falsch“ ein. Notiere jeweils den Verlust. Welcher Fall „bestraft“ das Training stärker?</li>
+ <li>Bei „alle gleich“ ist p = 25 % für jede Klasse. Berechne −ln(0,25). Diesen Verlust zeigt ein untrainiertes Netz mit 4 Klassen in der ersten Epoche ungefähr an!</li>
+ <li>In der Prüfstation soll ein Teil nur dann automatisch einsortiert werden, wenn das Netz „sicher genug“ ist. Welche Größe aus dieser Seite eignet sich dafür und welchen Grenzwert würdest du wählen?</li>
+</ol></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const K=['Kreuz','Kreis','Dreieck','Quadrat'];
+let z=[2.0,0.5,-0.5,0.2];
+const f=(v,d=2)=>(+v).toFixed(d).replace('.',',');
+function baue(){
+  $('regler').innerHTML=K.map((k,i)=>`<div class="regler"><label>z (${k})</label><input type="range" min="-6" max="6" step="0.1" id="z${i}" value="${z[i]}"><output id="z${i}-w"></output></div>`).join('');
+  K.forEach((_,i)=>$('z'+i).oninput=()=>{z[i]=+$('z'+i).value;rechne()});
+  $('wahr').innerHTML=K.map((k,i)=>`<option value="${i}">${i}: ${k}</option>`).join('');
+  $('wahr').onchange=rechne;
+}
+function softmax(v){const m=Math.max(...v);const e=v.map(x=>Math.exp(x-m));const s=e.reduce((a,b)=>a+b,0);return e.map(x=>x/s)}
+function rechne(){
+  K.forEach((_,i)=>{$('z'+i).value=z[i];$('z'+i+'-w').textContent=f(z[i],1)});
+  const p=softmax(z),w=+$('wahr').value,arg=p.indexOf(Math.max(...p));
+  $('balken').innerHTML=p.map((pi,i)=>`<div class="balken ${i===w?'wahr':''}"><span>${K[i]}</span><div class="spur"><div class="fuell" style="width:${pi*100}%"></div></div><span class="mono">${f(pi*100,1)} %</span></div>`).join('');
+  $('summe').textContent='Summe aller Wahrscheinlichkeiten: '+f(p.reduce((a,b)=>a+b,0)*100,1)+' %';
+  $('vorhersage').innerHTML=`${K[arg]} <span class="${arg===w?'gut':'schlecht'}">${arg===w?'✔ richtig':'✘ falsch'}</span>`;
+  $('onehot').innerHTML='y = [ '+K.map((k,i)=>`<span class="onehot ${i===w?'eins':''}" title="${k}">${i===w?1:0}</span>`).join('')+' ]';
+  const L=-Math.log(Math.max(p[w],1e-12));
+  $('verlust-zahl').textContent=f(L,3);
+  $('verlust-text').innerHTML=L<0.2?'<span class="gut">klein – das Netz liegt richtig und ist sich sicher</span>':L<1?'mittel – richtige Tendenz, aber noch unsicher':'<span class="schlecht">groß – das Training wird die Gewichte stark ändern</span>';
+  kurve(p[w]);
+}
+function kurve(pw){
+  const c=$('kurve'),g=c.getContext('2d'),W=c.width,H=c.height,P=34;g.clearRect(0,0,W,H);
+  const X=p=>P+p*(W-2*P),Y=l=>H-P/1.5-(Math.min(l,5)/5)*(H-P*1.2);
+  g.strokeStyle='#aaa';g.beginPath();g.moveTo(P,Y(0));g.lineTo(W-P,Y(0));g.moveTo(P,Y(0));g.lineTo(P,Y(5));g.stroke();
+  g.fillStyle='#555';g.font='12px sans-serif';
+  for(let k=0;k<=10;k++){g.fillText((k*10)+' %',X(k/10)-12,H-4)}
+  for(let l=0;l<=5;l++){g.fillText(l,P-14,Y(l)+4)}
+  g.strokeStyle='#1f5f99';g.lineWidth=2.5;g.beginPath();
+  for(let i=1;i<=400;i++){const p=i/400;const l=-Math.log(p);i>1?g.lineTo(X(p),Y(l)):g.moveTo(X(p),Y(l))}g.stroke();
+  g.fillStyle='#d9731a';g.beginPath();g.arc(X(pw),Y(-Math.log(Math.max(pw,1e-6))),7,0,7);g.fill();
+  g.fillStyle='#333';g.fillText('Verlust',P+4,12);g.fillText('p(richtige Klasse)',W-P-110,Y(0)-6);
+}
+const FALL={sicher:[4.5,0.2,-1,-0.5],unsicher:[0.6,0.4,0.1,0.3],falsch:[-1.5,0.1,4.2,0.3],gleich:[1,1,1,1]};
+document.querySelectorAll('[data-fall]').forEach(b=>b.onclick=()=>{z=[...FALL[b.dataset.fall]];$('wahr').value=0;rechne()});
+baue();rechne();
+</script>
+</body></html>

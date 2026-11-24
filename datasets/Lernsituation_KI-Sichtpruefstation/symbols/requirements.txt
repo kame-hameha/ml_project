@@ -1,0 +1,14 @@
+# Lernsituation KI-Sichtpruefstation - Python-Pakete (Raspberry Pi OS 64 Bit, Python 3.11)
+tensorflow>=2.16
+numpy
+opencv-python
+matplotlib
+pandas
+scikit-learn
+jupyterlab
+ipykernel
+ipython
+# optional, schlanke TFLite-Laufzeit fuer die Pruefstation (Skript 20):
+# ai-edge-litert
+# Auf dem Raspberry Pi bereits im System enthalten (venv mit --system-site-packages anlegen):
+# gpiozero, picamera2
