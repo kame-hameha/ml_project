@@ -1,0 +1,15 @@
+# Lernsituation KI-Sichtpruefstation - Python-Pakete
+# Raspberry Pi OS 64 Bit: Trixie (Python 3.13) oder Bookworm (Python 3.11)
+# Mit Python 3.13 installiert pip automatisch TensorFlow 2.20 oder neuer.
+tensorflow>=2.16        # enthaelt Keras 3
+ai-edge-litert          # TFLite-Laufzeit (LiteRT); tf.lite.Interpreter gibt es ab TensorFlow 2.20 nicht mehr
+numpy
+opencv-python
+matplotlib
+pandas
+scikit-learn
+jupyterlab
+ipykernel
+ipython
+# Auf dem Raspberry Pi bereits im System enthalten (venv mit --system-site-packages anlegen):
+# gpiozero, picamera2
