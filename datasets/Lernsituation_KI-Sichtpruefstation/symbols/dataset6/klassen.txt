@@ -1,4 +1,0 @@
-0;Kreuz
-1;Kreis
-2;Dreieck
-3;Quadrat
