@@ -35,7 +35,10 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import logging
+import os
 import time
+import warnings
 from pathlib import Path
 
 import cv2
@@ -49,6 +52,25 @@ BILDENDUNGEN = {".png", ".jpg", ".jpeg", ".bmp"}
 KLASSEN_DATEI = "klassen.txt"
 CACHE_ORDNER = ORDNER / ".cache"
 VORVERARBEITUNG = "linear-v3"     # aendert sich die Vorverarbeitung, wird neu geladen
+
+
+# =============================================================================
+# Technische Warnungen ausblenden (verwirren im Unterricht, sind harmlos)
+# =============================================================================
+# Auf False setzen, um bei der Fehlersuche alle Meldungen zu sehen.
+WARNUNGEN_AUSBLENDEN = True
+
+if WARNUNGEN_AUSBLENDEN:
+    # Startmeldungen von TensorFlow (C++). Wirkt nur, weil ki_hilfen VOR keras
+    # bzw. tensorflow importiert wird.
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+    # z. B. "The name tf.reset_default_graph is deprecated" (aus clear_session)
+    logging.getLogger("tensorflow").setLevel(logging.ERROR)
+    logging.getLogger("absl").setLevel(logging.ERROR)
+    # Keras: "shuffle=True was passed, but will be ignored ..." - gemischt wird
+    # bereits in als_tf_dataset().
+    warnings.filterwarnings("ignore", message=r".*`shuffle=True` was passed")
+    warnings.filterwarnings("ignore", message=r"Consider using IPython\.display\.IFrame")
 
 
 def _pfad(pfad) -> Path:
@@ -516,12 +538,13 @@ def zeige_html(datei: str | Path, hoehe: int = 600):
         "window.addEventListener('load',f);if(window.ResizeObserver){"
         "new ResizeObserver(f).observe(document.documentElement);}setTimeout(f,300);})();</script>")
     inhalt = inhalt.replace("</body>", anpassen + "</body>") if "</body>" in inhalt else inhalt + anpassen
+    # Das <div> drumherum verhindert die IPython-Warnung "Consider using IFrame".
     display(HTML(
-        f'<iframe srcdoc="{html.escape(inhalt, quote=True)}" '
+        f'<div><iframe srcdoc="{html.escape(inhalt, quote=True)}" '
         f'style="width:100%;height:{hoehe}px;border:1px solid #ccc;'
         f'border-radius:8px;background:white;display:block" '
         f'sandbox="allow-scripts allow-same-origin allow-popups allow-modals">'
-        f'</iframe>'))
+        f'</iframe></div>'))
 
 
 # =============================================================================
