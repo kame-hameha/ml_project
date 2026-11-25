@@ -1,4 +1,5 @@
 .venv/
+datasets/
 *.keras
 *.json
 *.h5
