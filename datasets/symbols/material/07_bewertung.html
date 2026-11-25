@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Modelle bewerten: Konfusionsmatrix und Fehlerkosten</title>
+<title>Modelle bewerten: Konfusionsmatrix</title>
 <style>:root{--blau:#1f5f99;--blau-hell:#e8f0f8;--orange:#d9731a;--gruen:#2e8b57;--rot:#c0392b;--grau:#5f6b76;--linie:#d5dde5;--hg:#f7f9fb}
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif;color:#1d2833;background:#fff;line-height:1.45;font-size:15px}
@@ -49,9 +49,9 @@ summary{cursor:pointer;color:var(--blau);font-weight:600}
 .kennzahl b{font-size:20px;display:block}
 </style></head><body>
 <header class="kopf"><div class="ls">Lernsituation KI-Sichtprüfstation · Doppelstunde 7</div>
-<h1>Ist das Modell gut genug für die Fertigung? Konfusionsmatrix und Fehlerkosten</h1></header>
+<h1>Ist das Modell gut genug für die Fertigung? Konfusionsmatrix</h1></header>
 <main>
-<p>Eine einzige Zahl wie „95 % Genauigkeit“ reicht in der Produktion nicht. Entscheidend ist, <b>welche</b> Fehler passieren und was sie <b>kosten</b>. Ein fehlerhaftes Teil, das zum Kunden gelangt (<b>Schlupf</b>), ist meist viel teurer als ein gutes Teil, das unnötig aussortiert wird (<b>Pseudoausschuss</b>).</p>
+<p>Eine einzige Zahl wie „95 % Genauigkeit“ reicht in der Produktion nicht. Entscheidend ist, <b>welche</b> Fehler passieren. Ein <b>fehlerhaftes Teil, das durchgelassen wird</b> und zum Kunden gelangt, ist meist viel problematischer als ein <b>gutes Teil, das unnötig aussortiert</b> wird.</p>
 
 <h2>1 · Gut-/Schlecht-Prüfung mit Entscheidungsschwelle</h2>
 <div class="reihe">
@@ -59,10 +59,7 @@ summary{cursor:pointer;color:var(--blau);font-weight:600}
   <div class="regler"><label>Schwelle</label><input type="range" id="s" min="0.01" max="0.99" step="0.01" value="0.5"><output id="s-w"></output></div>
   <div class="regler"><label>Trennschärfe</label><input type="range" id="q" min="0.5" max="4" step="0.1" value="2"><output id="q-w"></output></div>
   <div class="regler"><label>Fehleranteil</label><input type="range" id="a" min="0.01" max="0.3" step="0.01" value="0.05"><output id="a-w"></output></div>
-  <label>Teile pro Schicht <input type="number" id="n" value="2000"></label><br>
-  <label>Kosten Schlupf € <input type="number" id="ks" value="250"></label><br>
-  <label>Kosten Pseudoausschuss € <input type="number" id="kp" value="8"></label>
-  <div style="margin-top:6px"><button id="opt">Kostenoptimale Schwelle suchen</button></div>
+  <label>Teile pro Schicht <input type="number" id="n" value="2000"></label>
  </div>
  <div class="spalte">
   <canvas id="vert" width="640" height="220" style="width:100%"></canvas>
@@ -91,8 +88,8 @@ summary{cursor:pointer;color:var(--blau);font-weight:600}
 
 <div class="auftrag"><b>Arbeitsauftrag</b>
 <ol>
- <li>Bei Schwelle 0,5: Wie viele fehlerhafte Teile pro Schicht gelangen zum Kunden? Was kostet das?</li>
- <li>Suchen Sie die kostenoptimale Schwelle. Warum liegt sie <i>unter</i> 0,5? Wie verändert sie sich, wenn Schlupf nur 20 € kostet?</li>
+ <li>Bei Schwelle 0,5: Wie viele fehlerhafte Teile pro Schicht werden durchgelassen und gelangen zum Kunden? Wie viele gute Teile werden unnötig aussortiert?</li>
+ <li>Verschieben Sie die Schwelle. Wie verändern sich die beiden Fehlerarten – durchgelassene Fehler und unnötig aussortierte gute Teile – gegenläufig? Warum kann es sinnvoll sein, die Schwelle <i>unter</i> 0,5 zu legen?</li>
  <li>Stellen Sie den Fehleranteil auf 1 %. Ein Modell, das <i>immer</i> „i. O.“ sagt, hätte dann 99 % Accuracy. Warum ist es trotzdem unbrauchbar? Welche Kennzahl zeigt das?</li>
  <li>Tragen Sie die Konfusionsmatrix Ihres CNN aus Notebook 12 ein. Welche zwei Klassen werden am häufigsten verwechselt? Nennen Sie eine mögliche Ursache und eine Gegenmaßnahme bei der Datenaufnahme.</li>
 </ol></div>
@@ -104,12 +101,12 @@ const pct=x=>isFinite(x)?f(x*100,1)+' %':'–';
 // Scores: logistische Verteilungen um +-q (Trennschaerfe) auf der Logit-Achse
 const sig=x=>1/(1+Math.exp(-x)), logit=p=>Math.log(p/(1-p));
 const Phi=x=>{const t=1/(1+0.2316419*Math.abs(x)),d=0.3989423*Math.exp(-x*x/2);const p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p};
-function lies(){return{s:+$('s').value,q:+$('q').value,a:+$('a').value,n:+$('n').value,ks:+$('ks').value,kp:+$('kp').value}}
+function lies(){return{s:+$('s').value,q:+$('q').value,a:+$('a').value,n:+$('n').value}}
 function werte(p){
   const t=logit(p.s);const anteilFalschAlarm=1-Phi(t+p.q);const anteilErkannt=1-Phi(t-p.q);
   const schlecht=p.n*p.a,gut=p.n-schlecht;
   const TP=schlecht*anteilErkannt,FN=schlecht-TP,FP=gut*anteilFalschAlarm,TN=gut-FP;
-  return{TP,FN,FP,TN,kosten:FN*p.ks+FP*p.kp};
+  return{TP,FN,FP,TN};
 }
 function zeichne(p){
   const c=$('vert'),g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);
@@ -128,13 +125,12 @@ function update(){
   zeichne(p);const v=werte(p);const r=x=>Math.round(x).toLocaleString('de-DE');
   $('km2').innerHTML=`<tr><th rowspan="2">tatsächlich</th><th colspan="2">Entscheidung der Prüfstation</th></tr>
   <tr><th>i. O. (durchlassen)</th><th>n. i. O. (ausschleusen)</th></tr>
-  <tr><th>gutes Teil</th><td class="diag">${r(v.TN)}<br><span class="klein">richtig durchgelassen</span></td><td class="fehler">${r(v.FP)}<br><span class="klein">Pseudoausschuss</span></td></tr>
-  <tr><th>fehlerhaftes Teil</th><td class="fehler">${r(v.FN)}<br><span class="klein"><b>Schlupf</b></span></td><td class="diag">${r(v.TP)}<br><span class="klein">richtig erkannt</span></td></tr>`;
+  <tr><th>gutes Teil</th><td class="diag">${r(v.TN)}<br><span class="klein">richtig durchgelassen</span></td><td class="fehler">${r(v.FP)}<br><span class="klein">gutes Teil unnötig aussortiert</span></td></tr>
+  <tr><th>fehlerhaftes Teil</th><td class="fehler">${r(v.FN)}<br><span class="klein"><b>Fehler durchgelassen</b></span></td><td class="diag">${r(v.TP)}<br><span class="klein">richtig erkannt</span></td></tr>`;
   const acc=(v.TP+v.TN)/p.n,rec=v.TP/(v.TP+v.FN),pre=v.TP/(v.TP+v.FP);
-  $('kz2').innerHTML=`<span class="kennzahl">Accuracy<b>${pct(acc)}</b></span><span class="kennzahl">Recall n. i. O.<b>${pct(rec)}</b><span class="klein">Fehler gefunden</span></span><span class="kennzahl">Precision n. i. O.<b>${pct(pre)}</b><span class="klein">Ausschuss ist wirklich schlecht</span></span><span class="kennzahl">Kosten je Schicht<b>${r(v.kosten)} €</b><span class="klein">Schlupf ${r(v.FN*p.ks)} € · Pseudo ${r(v.FP*p.kp)} €</span></span>`;
+  $('kz2').innerHTML=`<span class="kennzahl">Accuracy<b>${pct(acc)}</b></span><span class="kennzahl">Recall n. i. O.<b>${pct(rec)}</b><span class="klein">Fehler gefunden</span></span><span class="kennzahl">Precision n. i. O.<b>${pct(pre)}</b><span class="klein">Ausschuss ist wirklich schlecht</span></span>`;
 }
-['s','q','a','n','ks','kp'].forEach(i=>$(i).oninput=update);
-$('opt').onclick=()=>{const p=lies();let best=0.5,bk=Infinity;for(let s=0.01;s<0.995;s+=0.005){const k=werte({...p,s}).kosten;if(k<bk){bk=k;best=s}}$('s').value=best.toFixed(2);update()};
+['s','q','a','n'].forEach(i=>$(i).oninput=update);
 
 const K=['Kreuz','Kreis','Dreieck','Quadrat'];
 const BSP={bsp1:[[52,3,9,2],[4,48,3,10],[11,2,47,7],[3,12,6,45]],bsp2:[[64,0,2,0],[0,62,0,3],[3,0,63,1],[0,4,1,61]]};
